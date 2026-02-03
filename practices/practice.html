@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Маркази Бозиҳои Тоҷикӣ</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --accent-color: #f1c40f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            border: 6px solid var(--accent-color);
+        }
+
+        /* Menu Styles */
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            font-size: 22px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #2980b9;
+            transition: 0.1s;
+        }
+
+        .menu-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #2980b9; }
+        .menu-btn.alt { background: var(--success-color); box-shadow: 0 5px 0 #27ae60; }
+        .menu-btn.alt:active { box-shadow: 0 2px 0 #27ae60; }
+
+        /* Game Elements */
+        .hidden { display: none; }
+        .progress { color: #7f8c8d; font-size: 18px; margin-bottom: 10px; }
+        
+        /* Word Game Specific */
+        .word-display { font-size: 50px; margin: 20px 0; font-weight: bold; }
+        .part-one { color: #e67e22; }
+        .part-two { color: #dcdde1; border-bottom: 5px dashed #dcdde1; }
+
+        /* Alphabet Game Specific */
+        .letter-box {
+            font-size: 90px; font-weight: bold; color: white;
+            background: var(--success-color);
+            width: 130px; height: 130px; line-height: 130px;
+            margin: 15px auto; border-radius: 20px;
+            box-shadow: 0 8px 0 #2e7d32;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+
+        .opt-btn {
+            background: var(--primary-color);
+            color: white; border: none; padding: 15px;
+            font-size: 20px; border-radius: 12px;
+            cursor: pointer; box-shadow: 0 4px 0 #2980b9;
+        }
+
+        .opt-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2980b9; }
+        
+        #message { font-size: 22px; margin-top: 15px; height: 30px; font-weight: bold; }
+        .back-btn { margin-top: 20px; background: #95a5a6; font-size: 14px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="game-container">
+        <div id="main-menu">
+            <h1 style="font-size: 35px; margin-bottom: 10px;">Интихоби бозӣ</h1>
+            <p>Яке аз режимҳоро интихоб кунед:</p>
+            <button class="menu-btn" onclick="startWordGame()">🧩 Калимасоз (20 марҳила)</button>
+            <button class="menu-btn alt" onclick="startAlphaGame()">🅰️ Алифбо (35 ҳарф)</button>
+        </div>
+
+        <div id="word-game" class="hidden">
+            <div class="progress" id="word-stat"></div>
+            <h2>Калимаро пурра кунед!</h2>
+            <div class="word-display">
+                <span class="part-one" id="w-first"></span><span class="part-two" id="w-second">...</span>
+            </div>
+            <div class="options-grid grid-2" id="word-options"></div>
+        </div>
+
+        <div id="alpha-game" class="hidden">
+            <div class="progress" id="alpha-stat"></div>
+            <h2>Калимаи мувофиқро ёбед!</h2>
+            <div class="letter-box" id="alpha-letter"></div>
+            <div class="options-grid" id="alpha-options"></div>
+            <div style="margin-top:10px">Холҳо: <span id="score-val" style="color:#e67e22; font-weight:bold;">0</span></div>
+        </div>
+
+        <div id="message"></div>
+        <button id="back-to-menu" class="opt-btn back-btn hidden" onclick="resetToMenu()">⬅️ Ба меню баргаштан</button>
+    </div>
+
+<script>
+    // --- Data ---
+    const wordLevels = [
+        { first: "МО", correct: "ШИН", variants: ["ШИН", "ҲӢ", "ДАР", "ЛО"] },
+        { first: "ТАР", correct: "БУЗ", variants: ["БУЗ", "ХОН", "ЛО", "МОН"] },
+        { first: "КИ", correct: "ТОБ", variants: ["ТОБ", "ШЕР", "ЛАР", "РӮЗ"] },
+        { first: "БА", correct: "НАН", variants: ["НАН", "ЧА", "ЛА", "ДАК"] },
+        { first: "МА", correct: "КТАБ", variants: ["КТАБ", "НГО", "ЛА", "ДО"] },
+        { first: "РУ", correct: "ЧКА", variants: ["ЧКА", "БОҲ", "ДА", "МОЛ"] },
+        { first: "СЕ", correct: "Б", variants: ["Б", "БИ", "ЛА", "КА"] },
+        { first: "ХО", correct: "НА", variants: ["НА", "СА", "РА", "ША"] },
+        { first: "ҶӮ", correct: "РОБ", variants: ["РОБ", "ҶА", "ҲО", "ДА"] },
+        { first: "ДАФ", correct: "ТАР", variants: ["ТАР", "МОР", "ФИЛ", "ЧА"] },
+        { first: "ОС", correct: "МОН", variants: ["МОН", "ПАН", "КӮҲ", "ГАР"] },
+        { first: "ОИ", correct: "НА", variants: ["НА", "ЛУ", "ҲИ", "ТА"] },
+        { first: "СИ", correct: "ТОРА", variants: ["ТОРА", "Б", "МО", "НУН"] },
+        { first: "ПАР", correct: "ВОНА", variants: ["ВОНА", "ГО", "ЧА", "ДАК"] },
+        { first: "МО", correct: "ҲӢ", variants: ["ҲӢ", "ШИН", "ДАР", "ТОБ"] },
+        { first: "ГАР", correct: "ДАН", variants: ["ДАН", "ФИЛ", "БУЗ", "ҶА"] },
+        { first: "ДА", correct: "РАХТ", variants: ["РАХТ", "ФАР", "Б", "ҲО"] },
+        { first: "ХУ", correct: "РӮС", variants: ["РӮС", "РМО", "НА", "К"] },
+        { first: "АН", correct: "ҶИР", variants: ["ҶИР", "ОР", "ГУШ", "ДУЗ"] },
+        { first: "А", correct: "СП", variants: ["СП", "БР", "НОР", "Б"] }
+    ];
+
+    const alphaLevels = [
+        { letter: "А", words: ["Анор", "Банан", "Себ"], correct: "Анор" },
+        { letter: "Б", words: ["Мор", "Бурӯт", "Китоб"], correct: "Бурӯт" },
+        { letter: "В", words: ["Варзиш", "Дарахт", "Нок"], correct: "Варзиш" },
+        { letter: "Г", words: ["Гул", "Пиёла", "Мизи"], correct: "Гул" },
+        { letter: "Ғ", words: ["Ғоз", "Хона", "Ҷом"], correct: "Ғоз" },
+        { letter: "Д", words: ["Дафтар", "Рӯбоҳ", "Фил"], correct: "Дафтар" },
+        { letter: "Е", words: ["Елка", "Осмон", "Абр"], correct: "Елка" },
+        { letter: "Ё", words: ["Ёқут", "Қалам", "Тӯб"], correct: "Ёқут" },
+        { letter: "Ж", words: ["Жола", "Моҳӣ", "Баҳор"], correct: "Жола" },
+        { letter: "З", words: ["Занг", "Хурӯс", "Оина"], correct: "Занг" },
+        { letter: "И", words: ["Истгоҳ", "Шер", "Парвона"], correct: "Истгоҳ" },
+        { letter: "Ӣ", words: ["МоҳиӢ", "Ситора", "Санг"], correct: "МоҳиӢ" },
+        { letter: "Й", words: ["ЧоЙ", "Кафш", "Табақ"], correct: "ЧоЙ" },
+        { letter: "К", words: ["Коала", "Мор", "Дарахт"], correct: "Коала" },
+        { letter: "Қ", words: ["Қалам", "Себ", "Нон"], correct: "Қалам" },
+        { letter: "Л", words: ["Лола", "Тӯб", "Китоб"], correct: "Лола" },
+        { letter: "М", words: ["Манго", "Санг", "Абр"], correct: "Манго" },
+        { letter: "Н", words: ["Нок", "Рӯбоҳ", "Оина"], correct: "Нок" },
+        { letter: "О", words: ["Олу", "Калид", "Гул"], correct: "Олу" },
+        { letter: "П", words: ["Парвона", "Шер", "Занг"], correct: "Парвона" },
+        { letter: "Р", words: ["Рангинкамон", "Дафтар", "Чой"], correct: "Рангинкамон" },
+        { letter: "С", words: ["Ситора", "Хона", "Асп"], correct: "Ситора" },
+        { letter: "Т", words: ["Тарбуз", "Мошин", "Қалам"], correct: "Тарбуз" },
+        { letter: "У", words: ["Уқоб", "Баҳор", "Ҷом"], correct: "Уқоб" },
+        { letter: "Ӯ", words: ["Ӯрдак", "Кӯҳ", "Нон"], correct: "Ӯрдак" },
+        { letter: "Ф", words: ["Фил", "Кӯҳ", "Осмон"], correct: "Фил" },
+        { letter: "Х", words: ["Хона", "Себ", "Дарё"], correct: "Хона" },
+        { letter: "Ҳ", words: ["Ҳавз", "Пайфил", "Малах"], correct: "Ҳавз" },
+        { letter: "Ч", words: ["Чатр", "Моҳӣ", "Бурӯт"], correct: "Чатр" },
+        { letter: "Ҷ", words: ["Ҷӯроб", "Шона", "Эзор"], correct: "Ҷӯроб" },
+        { letter: "Ш", words: ["Шер", "Пиёла", "Мизи"], correct: "Шер" },
+        { letter: "Ъ", words: ["РаЪд", "Даст", "Либос"], correct: "РаЪд" },
+        { letter: "Э", words: ["Элак", "Корд", "Ҷӯроб"], correct: "Элак" },
+        { letter: "Ю", words: ["Юнон", "Кафш", "Шона"], correct: "Юнон" },
+        { letter: "Я", words: ["Яхмос", "Даст", "Либос"], correct: "Яхмос" }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let activeMode = '';
+
+    // --- Core Logic ---
+    function showScreen(id) {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('word-game').classList.add('hidden');
+        document.getElementById('alpha-game').classList.add('hidden');
+        document.getElementById('back-to-menu').classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function resetToMenu() {
+        location.reload();
+    }
+
+    function updateMessage(txt, color) {
+        const m = document.getElementById('message');
+        m.innerText = txt;
+        m.style.color = color;
+    }
+
+    // --- Word Game Logic ---
+    function startWordGame() {
+        activeMode = 'word';
+        currentIdx = 0;
+        showScreen('word-game');
+        loadWordLevel();
+    }
+
+    function loadWordLevel() {
+        if(currentIdx >= wordLevels.length) {
+            finishGame("Офарин! Шумо калимасози моҳир ҳастед!");
+            return;
+        }
+        const level = wordLevels[currentIdx];
+        document.getElementById('word-stat').innerText = `Калимаи ${currentIdx + 1} аз ${wordLevels.length}`;
+        document.getElementById('w-first').innerText = level.first;
+        document.getElementById('w-second').innerText = "...";
+        document.getElementById('w-second').className = "part-two";
+        
+        const container = document.getElementById('word-options');
+        container.innerHTML = "";
+        updateMessage("", "");
+
+        [...level.variants].sort(() => Math.random() - 0.5).forEach(v => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = v;
+            b.onclick = () => {
+                if(v === level.correct) {
+                    document.getElementById('w-second').innerText = level.correct;
+                    document.getElementById('w-second').style.color = "#2ecc71";
+                    document.getElementById('w-second').style.border = "none";
+                    updateMessage("Офарин! ✨", "#2ecc71");
+                    setTimeout(() => { currentIdx++; loadWordLevel(); }, 1000);
+                } else {
+                    updateMessage("Хато! ❌", "#e74c3c");
+                }
+            };
+            container.appendChild(b);
+        });
+    }
+
+    // --- Alphabet Game Logic ---
+    function startAlphaGame() {
+        activeMode = 'alpha';
+        currentIdx = 0;
+        score = 0;
+        showScreen('alpha-game');
+        loadAlphaLevel();
+    }
+
+    function loadAlphaLevel() {
+        if(currentIdx >= alphaLevels.length) {
+            finishGame(`Ғалаба! Шумо ҳамаи 35 ҳарфро гузаштед! Хол: ${score}`);
+            return;
+        }
+        const q = alphaLevels[currentIdx];
+        document.getElementById('alpha-stat').innerText = `Ҳарфи ${currentIdx + 1} аз 35`;
+        document.getElementById('alpha-letter').innerText = q.letter;
+        document.getElementById('score-val').innerText = score;
+        
+        const container = document.getElementById('alpha-options');
+        container.innerHTML = "";
+        updateMessage("", "");
+
+        [...q.words].sort(() => Math.random() - 0.5).forEach(word => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = word;
+            b.onclick = () => {
+                if(word === q.correct) {
+                    score++;
+                    updateMessage("Дуруст! ✅", "#2ecc71");
+                    setTimeout(() => { currentIdx++; loadAlphaLevel(); }, 1000);
+                } else {
+                    updateMessage("Кӯшиш кунед! ❌", "#e74c3c");
+                }
+            };
+            container.appendChild(b);
+        });
+    }
+
+    function finishGame(msg) {
+        document.getElementById('game-container').innerHTML = `
+            <h1 style="font-size:50px;">🏆</h1>
+            <h1>ҒАЛАБА!</h1>
+            <p style="font-size:20px;">${msg}</p>
+            <button class="menu-btn" onclick="location.reload()">Баргаштан ба аввал</button>
+        `;
+    }
+</script>
+</body>
+</html>

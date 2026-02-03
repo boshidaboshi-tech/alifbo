@@ -6,6 +6,71 @@
     <title>АЛИФБО</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial, sans-serif; background:#f4f4f9; min-height:200vh; }
+    
+    .burger-container {
+      position: fixed;
+      top: 15px;
+      left: 20px;
+      z-index: 1200;
+    }
+    .burger {
+      width: 40px;
+      height: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .burger span {
+      width: 100%;
+      height: 5px;
+      background: #1a1a2e;
+      border-radius: 4px;
+      transition: all 0.35s ease;
+    }
+    .menu.open ~ .burger-container .burger span {
+      background: white;
+    }
+    .burger.active span:nth-child(1) { transform: translateY(12px) rotate(45deg); }
+    .burger.active span:nth-child(2) { opacity: 0; }
+    .burger.active span:nth-child(3) { transform: translateY(-12px) rotate(-45deg); }
+
+    .menu {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #16213e;
+      color: white;
+      padding: 80px 20px 40px;
+      height: 100vh;
+      overflow-y: auto;
+      transform: translateY(-100%);
+      transition: transform 0.45s ease;
+      z-index: 1000;
+    }
+    .menu.open { transform: translateY(0); }
+    .menu h2 { text-align: center; margin-bottom: 25px; color: #00d4ff; font-size: 1.8rem; }
+    .menu ul {
+      list-style: none;
+      padding: 0;
+      columns: 2;
+      column-gap: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .menu li {
+      margin: 14px 0;
+      font-size: 1.5rem;
+      break-inside: avoid; /* ҳар сатр дар сутуни нав намеафтад */
+    }
+    .menu a {
+      color: #e0e0ff;
+      text-decoration: none;
+    }
+    .menu a:hover { color: #00d4ff; }
+
+    .content { padding: 100px 20px; text-align: center; font-size: 1.3rem; }
         .dropdown {
             position: relative;
             display: inline-block;
@@ -60,12 +125,11 @@
 <body>
     <header>
         <nav>
-            <div class="logo">LOGO</div>
+            <div class="logo"></div>
             <button class="menu-toggle">Menu</button>
             <ul class="nav-links">
                 <li><a href="index.html">Acocи</a></li>
                 <li class="dropdown">
-                    <a href="lessons.html">Дарсҳо</a>
                     <div class="dropdown-content">
                         <a href="lessons/lessons1.html">Дарси 1</a>
                         <a href="lessons/lessons2.html">Дарси 2</a>
@@ -104,27 +168,90 @@
                         <a href="lessons/lessons35.html">Дарси 35</a>
                     </div>
                 </li>
-                <li><a href="practice.html">Амалиёт</a></li>
+                <li><a href="practices/practice.html">Амалиёт</a></li>
                 <li><a href="contact.html">Тамос</a></li>
             </ul>
         </nav>
-    </header>
-    
-    <main>
-        <section>
-            <h1 class="alifbo">
-                <span class="alifbo_text">А Л</span>
-                <span class="alifbo_text">И Ф</span> 
-                <span class="alifbo_text">Б О</span> 
-            </h1>
-            <h1>Омӯзиши алифбои забони тоҷики барои наврасон </h1>
-            <h2>Осон ва зуд</h2>
-            <a href="lessons.html" class="cta-button">Оғози омӯзиши</a>
-        </section>
-    </main>
+        <nav class="menu" id="menu">
+    <h2>Алифбо</h2>
+    <ul>
+      <li><a href="lessons/lesson0.html">— Дарси 0</a></li>
+      <li><a href="lessons/lesson1.html">Аа — Дарси 1</a></li>
+      <li><a href="lessons/lesson2.html">Бб — Дарси 2</a></li>
+      <li><a href="lessons/lesson3.html">Вв — Дарси 3</a></li>
+      <li><a href="lessons/lesson4.html">Гг — Дарси 4</a></li>
+      <li><a href="lessons/lesson5.html">Ғғ — Дарси 5</a></li>
+      <li><a href="lessons/lesson6.html">Дд — Дарси 6</a></li>
+      <li><a href="lessons/lesson7.html">Ее — Дарси 7</a></li>
+      <li><a href="lessons/lesson8.html">Ёё — Дарси 8</a></li>
+      <li><a href="lessons/lesson9.html">Жж — Дарси 9</a></li>
+      <li><a href="lessons/lesson10.html">Зз — Дарси 10</a></li>
+      <li><a href="lessons/lesson11.html">Ии — Дарси 11</a></li>
+      <li><a href="lessons/lesson12.html">Ӣӣ — Дарси 12</a></li>
+      <li><a href="lessons/lesson13.html">Йй — Дарси 13</a></li>
+      <li><a href="lessons/lesson14.html">Кк — Дарси 14</a></li>
+      <li><a href="lessons/lesson15.html">Ққ — Дарси 15</a></li>
+      <li><a href="lessons/lesson16.html">Лл — Дарси 16</a></li>
+      <li><a href="lessons/lesson17.html">Мм — Дарси 17</a></li>
+      <li><a href="lessons/lesson18.html">Нн — Дарси 18</a></li>
+      <li><a href="lessons/lesson19.html">Оо — Дарси 19</a></li>
+      <li><a href="lessons/lesson20.html">Пп — Дарси 20</a></li>
+      <li><a href="lessons/lesson21.html">Рр — Дарси 21</a></li>
+      <li><a href="lessons/lesson22.html">Сс — Дарси 22</a></li>
+      <li><a href="lessons/lesson23.html">Тт — Дарси 23</a></li>
+      <li><a href="lessons/lesson24.html">Уу — Дарси 24</a></li>
+      <li><a href="lessons/lesson25.html">Ӯӯ — Дарси 25</a></li>
+      <li><a href="lessons/lesson26.html">Фф — Дарси 26</a></li>
+      <li><a href="lessons/lesson27.html">Хх — Дарси 27</a></li>
+      <li><a href="lessons/lesson28.html">Ҳҳ — Дарси 28</a></li>
+      <li><a href="lessons/lesson29.html">Чч — Дарси 29</a></li>
+      <li><a href="lessons/lesson30.html">Ҷҷ — Дарси 30</a></li>
+      <li><a href="lessons/lesson31.html">Шш — Дарси 31</a></li>
+      <li><a href="lessons/lesson32.html">Ъъ — Дарси 32</a></li>
+      <li><a href="lessons/lesson33.html">Ээ — Дарси 33</a></li>
+      <li><a href="lessons/lesson34.html">Юю — Дарси 34</a></li>
+      <li><a href="lessons/lesson35.html">Яя — Дарси 35</a></li>
+    </ul>
+  </nav>
+
+  <div class="burger-container">
+    <div class="burger" id="burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  </header>
+  <main>
+    <section>
+      <h1 class="alifbo">
+        <span class="alifbo_text">А Л</span>
+        <span class="alifbo_text">И Ф</span> 
+        <span class="alifbo_text">Б О</span> 
+      </h1>
+        <h1>Омӯзиши алифбои забони тоҷики барои наврасон </h1>
+        <h2>Осон ва зуд</h2>
+    </section>
+  </main>
 
     <footer>
-        <p>&copy; 2025 Alifbo. Ҳамаи дарсҳо ҳифз шудаанд.</p>
+      <p>&copy; 2025 Alifbo. Ҳамаи дарсҳо ҳифз шудаанд.</p>
     </footer>
+  <script>
+    const burger = document.getElementById('burger');
+    const menu = document.getElementById('menu');
+
+    burger.addEventListener('click', () => {
+      menu.classList.toggle('open');
+      burger.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !burger.contains(e.target) && !e.target.closest('.burger-container')) {
+        menu.classList.remove('open');
+        burger.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>
